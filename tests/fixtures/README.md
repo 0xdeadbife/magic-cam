@@ -1,0 +1,1 @@
+`portrait.jpg` is the public portrait fixture used by Google MediaPipe, downloaded from https://storage.googleapis.com/mediapipe-assets/portrait.jpg for real-model visual regression checks. It is test data only, never part of the production application or its camera flow.
