@@ -95,4 +95,4 @@ A physical webcam and OBS still need a manual pass for permissions, device switc
 
 ## MediaPipe assets
 
-MediaPipe Tasks Vision is pinned to `0.10.32`; the Pages test verifies the local-only runtime path. The app uses Google's [Face Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker/web_js) and [Image Segmenter](https://developers.google.com/edge/mediapipe/solutions/vision/image_segmenter/web_js) models. The screenshots use MediaPipe's public portrait test fixture.
+MediaPipe Tasks Vision is pinned to `0.10.32`; the Pages test verifies the local-only runtime path. The app uses Google's [Face Landmarker](https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker/web_js) and [Image Segmenter](https://developers.google.com/edge/mediapipe/solutions/vision/image_segmenter/web_js) models. The screenshots use a fictional portrait created for this repository.
