@@ -43,9 +43,9 @@ test("compiled studio loads models and shared output from a repository subpath",
     "data-live",
     "true",
   );
-  await page.getByRole("switch", { name: "Enable background blur" }).click();
-  await page.getByRole("switch", { name: "Enable face pixelation" }).click();
-  await page.getByRole("switch", { name: "Enable film grain" }).click();
+  await page.getByRole("switch", { name: "Enable Backdrop Blur" }).click();
+  await page.getByRole("switch", { name: "Enable Face Mosaic" }).click();
+  await page.getByRole("switch", { name: "Enable Film Grain" }).click();
   await expect(page.getByTestId("tracking-status")).toHaveAttribute(
     "data-mode",
     "worker",
@@ -55,13 +55,13 @@ test("compiled studio loads models and shared output from a repository subpath",
     timeout: 30000,
   });
   expect(page.workers()).toHaveLength(2);
-  await page.getByRole("combobox", { name: "Hold for" }).selectOption("0");
+  await page.getByRole("combobox", { name: "Duration" }).selectOption("0");
   await page.getByRole("button", { name: "Freeze frame", exact: true }).click();
   const held = await page
     .locator("canvas")
     .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
   const popupPromise = page.waitForEvent("popup");
-  await page.getByRole("button", { name: "Open clean output" }).click();
+  await page.getByRole("button", { name: "Open OBS output" }).click();
   const output = await popupPromise;
   await expect(output).toHaveURL(/\/pages-check\/\?output=1$/);
   await expect
@@ -79,7 +79,7 @@ test("compiled studio loads models and shared output from a repository subpath",
     ),
   ).toBe(1);
   // Controls still operate in the studio while the clean window is open.
-  await page.getByRole("slider", { name: "Grain amount" }).fill("72");
+  await page.getByRole("slider", { name: "Intensity" }).fill("72");
   expect(
     await page
       .locator("canvas")
@@ -96,7 +96,7 @@ test("compiled studio loads models and shared output from a repository subpath",
     )
     .not.toBe(held);
   await output.close();
-  await page.getByRole("button", { name: "Reset all effects" }).click();
+  await page.getByRole("button", { name: "Reset visual settings" }).click();
   await expect.poll(() => page.workers().length).toBe(0);
   await page.getByRole("button", { name: "Stop", exact: true }).click();
   await expect(page.getByTestId("camera-status")).toHaveAttribute(
@@ -128,7 +128,7 @@ test("compiled main-thread fallback resolves WASM and model inside the repositor
     "data-live",
     "true",
   );
-  await page.getByRole("switch", { name: "Enable face pixelation" }).click();
+  await page.getByRole("switch", { name: "Enable Face Mosaic" }).click();
   await expect(page.getByTestId("tracking-status")).toHaveAttribute(
     "data-mode",
     "main",
@@ -153,7 +153,7 @@ test("direct clean-output URL is static and never requests its own camera", asyn
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./?output=1");
   await expect(
-    page.getByText("Open Clean output from the Magic Cam studio", {
+    page.getByText("Open OBS Output from the Magic Cam studio", {
       exact: false,
     }),
   ).toBeVisible();

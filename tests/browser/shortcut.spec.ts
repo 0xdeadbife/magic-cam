@@ -23,7 +23,7 @@ test("Space toggles hold once, uses the configured duration and respects editing
   await expect(
     page.getByRole("button", { name: "Freeze frame", exact: true }),
   ).toBeVisible();
-  await page.getByRole("combobox", { name: "Hold for" }).selectOption("-1");
+  await page.getByRole("combobox", { name: "Duration" }).selectOption("-1");
   await page.locator("#custom-seconds").fill("1");
   await page.keyboard.press("Space");
   await expect(

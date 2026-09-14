@@ -19,14 +19,14 @@ test("image mode survives toggling, reset cancels pending uploads, and help supp
   };
   await page.locator("input[type=file]").setInputFiles(file);
   await page
-    .getByRole("button", { name: "Replace camera", exact: true })
+    .getByRole("button", { name: "Replace camera feed", exact: true })
     .click();
-  const toggle = page.getByRole("switch", { name: "Enable image layer" });
+  const toggle = page.getByRole("switch", { name: "Enable Image Layer" });
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-checked", "false");
   await toggle.click();
   await expect(
-    page.getByRole("button", { name: "Replace camera", exact: true }),
+    page.getByRole("button", { name: "Replace camera feed", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "Remove image" }).click();
   await page.evaluate(() => {
@@ -41,11 +41,13 @@ test("image mode survives toggling, reset cancels pending uploads, and help supp
   });
   await page.locator("input[type=file]").setInputFiles(file);
   await expect(page.getByText("Opening…")).toBeVisible();
-  await page.getByRole("button", { name: "Reset all effects" }).click();
+  await page.getByRole("button", { name: "Reset visual settings" }).click();
   await page.evaluate(() =>
     (window as unknown as { finishDecode: () => void }).finishDecode(),
   );
-  await expect(page.getByRole("button", { name: "Add image" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Choose image" }),
+  ).toBeVisible();
   await expect(toggle).toHaveAttribute("aria-checked", "false");
   await page.getByRole("button", { name: "OBS setup guide" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -54,7 +56,7 @@ test("image mode survives toggling, reset cancels pending uploads, and help supp
   ).toBeFocused();
   await page.keyboard.press("Shift+Tab");
   await expect(
-    page.getByRole("button", { name: "Done", exact: true }),
+    page.getByRole("button", { name: "Close", exact: true }),
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -151,7 +153,7 @@ test("camera, worker tracking, final-frame freeze, shared output and cleanup", a
   await expect(
     page.locator('[data-testid="camera-status"][data-live="true"]'),
   ).toBeVisible();
-  await page.getByRole("switch", { name: "Enable face pixelation" }).click();
+  await page.getByRole("switch", { name: "Enable Face Mosaic" }).click();
   await expect(
     page.locator('[data-testid="tracking-status"][data-mode="worker"]'),
   ).toBeVisible({
@@ -163,7 +165,7 @@ test("camera, worker tracking, final-frame freeze, shared output and cleanup", a
   await expect(
     page.locator(".telemetry").getByText("ms", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("combobox", { name: "Hold for" }).selectOption("0");
+  await page.getByRole("combobox", { name: "Duration" }).selectOption("0");
   await page.getByRole("button", { name: "Freeze frame", exact: true }).click();
   const frozen = await page
     .locator("canvas")
@@ -176,7 +178,7 @@ test("camera, worker tracking, final-frame freeze, shared output and cleanup", a
       .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL()),
   ).toBe(frozen);
   const popupPromise = page.waitForEvent("popup");
-  await page.getByRole("button", { name: "Open clean output" }).click();
+  await page.getByRole("button", { name: "Open OBS output" }).click();
   const popup = await popupPromise;
   await expect(popup.locator("video")).toBeVisible();
   await expect
@@ -206,7 +208,7 @@ test("camera, worker tracking, final-frame freeze, shared output and cleanup", a
         .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL()),
     )
     .not.toBe(frozen);
-  await page.getByRole("combobox", { name: "Hold for" }).selectOption("-1");
+  await page.getByRole("combobox", { name: "Duration" }).selectOption("-1");
   await page.locator("#custom-seconds").fill("1");
   await page.getByRole("button", { name: "Freeze frame", exact: true }).click();
   await expect(
@@ -217,7 +219,7 @@ test("camera, worker tracking, final-frame freeze, shared output and cleanup", a
   ).toBeVisible({ timeout: 4000 });
   await popup.close();
   await expect(
-    page.getByRole("button", { name: "Open clean output" }),
+    page.getByRole("button", { name: "Open OBS output" }),
   ).toBeVisible();
   await page.evaluate(() =>
     (window as unknown as { __cameraStream: MediaStream }).__cameraStream
@@ -240,7 +242,9 @@ test("camera, worker tracking, final-frame freeze, shared output and cleanup", a
         .every((track) => track.readyState === "ended"),
     ),
   ).toBe(true);
-  await expect(page.getByText("Tracking off", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Face tracking off", { exact: true }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -282,7 +286,7 @@ test("image replacement, overlay controls, freeze and reset compose correctly", 
   await page.getByRole("slider", { name: "Opacity" }).fill("0");
   await expect.poll(center).not.toEqual([255, 0, 0, 255]);
   await page
-    .getByRole("button", { name: "Replace camera", exact: true })
+    .getByRole("button", { name: "Replace camera feed", exact: true })
     .click();
   await expect.poll(center).toEqual([255, 0, 0, 255]);
   expect(
@@ -292,12 +296,12 @@ test("image replacement, overlay controls, freeze and reset compose correctly", 
         Array.from(canvas.getContext("2d")!.getImageData(0, 0, 1, 1).data),
       ),
   ).toEqual([0, 0, 0, 255]);
-  await page.getByRole("combobox", { name: "Hold for" }).selectOption("0");
+  await page.getByRole("combobox", { name: "Duration" }).selectOption("0");
   await page.getByRole("button", { name: "Freeze frame", exact: true }).click();
   await page.getByRole("button", { name: "Remove image" }).click();
   await page.waitForTimeout(200);
   expect(await center()).toEqual([255, 0, 0, 255]);
-  await page.getByRole("button", { name: "Reset all effects" }).click();
+  await page.getByRole("button", { name: "Reset visual settings" }).click();
   await expect.poll(center).not.toEqual([255, 0, 0, 255]);
   await expect(
     page.getByRole("button", { name: "Mirror webcam" }),
@@ -369,7 +373,7 @@ test("reduced-rate main-thread fallback works when Workers are unavailable", asy
   await expect(
     page.locator('[data-testid="camera-status"][data-live="true"]'),
   ).toBeVisible();
-  await page.getByRole("switch", { name: "Enable face pixelation" }).click();
+  await page.getByRole("switch", { name: "Enable Face Mosaic" }).click();
   await expect(
     page.locator('[data-testid="tracking-status"][data-mode="main"]'),
   ).toBeVisible({
@@ -378,8 +382,10 @@ test("reduced-rate main-thread fallback works when Workers are unavailable", asy
   await expect(
     page.getByText("Face lost", { exact: true }).first(),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Reset all effects" }).click();
-  await expect(page.getByText("Tracking off", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Reset visual settings" }).click();
+  await expect(
+    page.getByText("Face tracking off", { exact: true }),
+  ).toBeVisible();
 });
 
 test("pixelation changes only the face region and respects mirroring", async ({

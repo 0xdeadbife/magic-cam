@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import {
   ArrowUpRight,
   Camera,
@@ -177,11 +171,11 @@ function Help({ close }: { close: () => void }) {
         <X size={18} />
       </button>
       <MonitorUp size={25} className="accent" />
-      <h2 id="obs-title">Connect to OBS.</h2>
+      <h2 id="obs-title">Connect OBS</h2>
       <ol>
         <li>
-          <strong>Open clean output</strong>
-          <p>Start your camera, add effects, then open the output window.</p>
+          <strong>Open OBS Output</strong>
+          <p>Start the camera, set your look, then open the output window.</p>
         </li>
         <li>
           <strong>OBS → Window Capture</strong>
@@ -196,12 +190,11 @@ function Help({ close }: { close: () => void }) {
         </li>
       </ol>
       <p className="help-note">
-        Keep both windows open and the output unminimized. It shares this
-        studio’s stream. Use Window Capture, not OBS Browser Source; manage
-        audio in OBS.
+        Keep both windows open and the output visible. It shares this studio’s
+        processed stream. Use Window Capture; manage audio in OBS.
       </p>
       <button className="button primary" onClick={close}>
-        Done
+        Close
       </button>
     </dialog>
   );
@@ -219,6 +212,8 @@ export function App() {
     setDeviceId,
     duration,
     setDuration,
+    customSeconds,
+    setCustomSeconds,
     imageName,
     imageUrl,
     notice,
@@ -236,7 +231,6 @@ export function App() {
     reset,
     trackingLabel,
   } = useStudio();
-  const [customSeconds, setCustomSeconds] = useState("8");
   const toggleFreeze = useCallback(() => {
     const current = studio.current;
     if (current?.state.capture !== "live") return;
@@ -304,10 +298,10 @@ export function App() {
         <div className="top-actions">
           <span
             className="local-status"
-            title="Video and images stay on this device"
+            title="Processing stays in this browser · visual settings are saved for this site"
           >
             <LockKeyhole size={12} />
-            <span>Local</span>
+            <span>On-device</span>
           </span>
           <button
             className="icon-button"
@@ -320,7 +314,7 @@ export function App() {
           <button
             className={`button output-button ${state.outputOpen ? "connected" : ""}`}
             aria-label={
-              state.outputOpen ? "Show clean output" : "Open clean output"
+              state.outputOpen ? "Show OBS output" : "Open OBS output"
             }
             onClick={() => {
               if (!studio.current?.openOutput())
@@ -330,7 +324,7 @@ export function App() {
             }}
           >
             <MonitorUp size={16} />
-            <span>Output</span>
+            <span>OBS Output</span>
             <ArrowUpRight size={14} />
           </button>
         </div>
@@ -356,7 +350,7 @@ export function App() {
                 className={`live-tag ${live ? "is-live" : ""} ${state.frozen ? "frozen" : ""}`}
               >
                 <i />
-                {state.frozen ? "Held" : live ? "Live" : "Camera off"}
+                {state.frozen ? "Frozen" : live ? "Live" : "Camera off"}
               </span>
             </div>
             <section className="preview-panel">
@@ -410,7 +404,7 @@ export function App() {
                   <div className="frame-badge">
                     <Snowflake size={13} />
                     {state.freezeRemaining === null
-                      ? "Held"
+                      ? "Frozen"
                       : `${state.freezeRemaining.toFixed(1)}s`}
                   </div>
                 )}
@@ -475,11 +469,11 @@ export function App() {
                   disabled={!live}
                   aria-label={state.frozen ? "Release frame" : "Freeze frame"}
                   aria-keyshortcuts="Space"
-                  title="Space — hold / release"
+                  title="Space · freeze / release"
                   onClick={toggleFreeze}
                 >
                   {state.frozen ? <Play size={12} /> : <Snowflake size={12} />}
-                  <span>{state.frozen ? "Release" : "Hold"}</span>
+                  <span>{state.frozen ? "Release" : "Freeze"}</span>
                 </button>
                 <span className="divider" />
                 <button
@@ -533,22 +527,22 @@ export function App() {
                 title={modeDescription}
               >
                 <Focus size={12} />
-                {state.frozen ? "Tracking paused" : trackingLabel}
+                {state.frozen ? "Face tracking paused" : trackingLabel}
               </span>
             </div>
             {state.trackingError && (
               <p className="error-text" role="alert">
-                {state.trackingError} Toggle pixelation to retry.
+                {state.trackingError} Toggle Face Mosaic to retry.
               </p>
             )}
           </div>
           <aside className="effects-column">
             <div className="section-heading">
-              <h2>Effects</h2>
+              <h2>Tools</h2>
               <button
                 className="icon-button"
-                aria-label="Reset all effects"
-                title="Reset to live webcam"
+                aria-label="Reset visual settings"
+                title="Restore clean camera"
                 onClick={reset}
               >
                 <RotateCcw size={14} />
@@ -557,11 +551,11 @@ export function App() {
             <div className="effects-rack">
               <Effect
                 icon={<CircleDashed size={17} />}
-                title="Background blur"
+                title="Backdrop Blur"
                 active={settings.backgroundBlur}
                 control={
                   <Toggle
-                    label="Enable background blur"
+                    label="Enable Backdrop Blur"
                     checked={settings.backgroundBlur}
                     onChange={() =>
                       update({ backgroundBlur: !settings.backgroundBlur })
@@ -572,15 +566,15 @@ export function App() {
                 {settings.backgroundBlur && (
                   <div className="effect-adjustments">
                     <Slider
-                      label="Blur amount"
+                      label="Strength"
                       value={settings.blurAmount}
                       min={0}
                       max={100}
                       onChange={(n) => update({ blurAmount: n })}
                     />
-                    <div title="Smoothly increases the blur away from the person. Zero applies uniform background blur.">
+                    <div title="Increases blur with distance from the person. Zero keeps the backdrop uniformly blurred.">
                       <Slider
-                        label="Falloff"
+                        label="Blur ramp"
                         value={settings.blurFalloff}
                         min={0}
                         max={100}
@@ -594,24 +588,24 @@ export function App() {
                       data-state={state.segmentation}
                     >
                       {settings.imageMode === "replace" ? (
-                        "Paused · image replacement"
+                        "Off during feed replacement"
                       ) : state.frozen ? (
-                        "Held"
+                        "Paused while frozen"
                       ) : !live ? (
-                        "Ready when camera starts"
+                        "Starts with camera"
                       ) : settings.blurAmount === 0 ? (
-                        "Amount is zero"
+                        "Strength at 0%"
                       ) : state.segmentation === "loading" ? (
                         <>
                           <LoaderCircle size={12} className="spin" />
-                          Loading person model…
+                          Loading person mask…
                         </>
                       ) : state.segmentation === "error" ? (
                         "Unavailable · toggle to retry"
                       ) : state.segmentation === "lost" ? (
-                        "No person / waiting for a fresh mask"
+                        "Person not found"
                       ) : (
-                        "Subject protected"
+                        "Person mask active"
                       )}
                       {state.segmentationMs !== null && (
                         <span title="Measured person segmentation duration">
@@ -629,11 +623,11 @@ export function App() {
               </Effect>
               <Effect
                 icon={<Film size={17} />}
-                title="Film grain"
+                title="Film Grain"
                 active={settings.grain}
                 control={
                   <Toggle
-                    label="Enable film grain"
+                    label="Enable Film Grain"
                     checked={settings.grain}
                     onChange={() => update({ grain: !settings.grain })}
                   />
@@ -642,15 +636,15 @@ export function App() {
                 {settings.grain && (
                   <div className="effect-adjustments">
                     <Slider
-                      label="Grain amount"
+                      label="Intensity"
                       value={settings.grainAmount}
                       min={0}
                       max={100}
                       onChange={(n) => update({ grainAmount: n })}
                     />
-                    <div title="Fine to coarse grain. Does not alter color or sharpness.">
+                    <div title="Fine to coarse monochrome grain.">
                       <Slider
-                        label="Grain size"
+                        label="Scale"
                         value={settings.grainSize}
                         min={0}
                         max={100}
@@ -662,11 +656,11 @@ export function App() {
               </Effect>
               <Effect
                 icon={<Grid2X2 size={17} />}
-                title="Pixelate"
+                title="Face Mosaic"
                 active={settings.pixelate}
                 control={
                   <Toggle
-                    label="Enable face pixelation"
+                    label="Enable Face Mosaic"
                     checked={settings.pixelate}
                     onChange={() => update({ pixelate: !settings.pixelate })}
                   />
@@ -674,7 +668,7 @@ export function App() {
               >
                 {settings.pixelate && (
                   <Slider
-                    label="Pixel size"
+                    label="Block size"
                     min={4}
                     max={64}
                     value={settings.pixelSize}
@@ -683,16 +677,16 @@ export function App() {
                   />
                 )}
                 {settings.pixelate && settings.imageMode === "replace" && (
-                  <p className="effect-note">Paused in replacement mode</p>
+                  <p className="effect-note">Off during feed replacement</p>
                 )}
               </Effect>
               <Effect
                 icon={<Snowflake size={17} />}
-                title="Freeze"
+                title="Frame Hold"
                 active={state.frozen}
               >
                 <div className="duration-row">
-                  <label htmlFor="duration">Hold for</label>
+                  <label htmlFor="duration">Duration</label>
                   <div className="select-wrap">
                     <select
                       id="duration"
@@ -724,14 +718,18 @@ export function App() {
                     />
                   </label>
                 )}
+                <div className="shortcut-note">
+                  <kbd>Space</kbd>
+                  <span>Freeze / release</span>
+                </div>
               </Effect>
               <Effect
                 icon={<ImagePlus size={17} />}
-                title="Image"
+                title="Image Layer"
                 active={settings.imageMode !== "off"}
                 control={
                   <Toggle
-                    label="Enable image layer"
+                    label="Enable Image Layer"
                     checked={settings.imageMode !== "off"}
                     disabled={!imageName}
                     onChange={() =>
@@ -767,8 +765,8 @@ export function App() {
                     <div className="image-file">
                       <button
                         className="image-thumbnail"
-                        title="Replace image"
-                        aria-label="Replace image"
+                        title="Change image"
+                        aria-label="Change image"
                         onClick={() => fileInput.current?.click()}
                       >
                         <img src={imageUrl} alt="Uploaded layer thumbnail" />
@@ -794,13 +792,13 @@ export function App() {
                       ) : (
                         <Upload size={19} />
                       )}
-                      <span>{uploading ? "Opening…" : "Add image"}</span>
+                      <span>{uploading ? "Opening…" : "Choose image"}</span>
                     </button>
                   )}
                 </div>
                 {imageName && (
                   <>
-                    <div className="segmented" aria-label="Image mode">
+                    <div className="segmented" aria-label="Layer mode">
                       <button
                         aria-pressed={settings.imageMode === "overlay"}
                         className={
@@ -812,20 +810,20 @@ export function App() {
                         Overlay
                       </button>
                       <button
-                        aria-label="Replace camera"
+                        aria-label="Replace camera feed"
                         aria-pressed={settings.imageMode === "replace"}
                         className={
                           settings.imageMode === "replace" ? "selected" : ""
                         }
                         onClick={() => update({ imageMode: "replace" })}
                       >
-                        Replace
+                        Replace feed
                       </button>
                     </div>
                     {settings.imageMode === "overlay" && (
                       <div className="image-adjustments">
                         <Slider
-                          label="Size"
+                          label="Scale"
                           min={5}
                           max={100}
                           value={settings.imageSize}
@@ -840,14 +838,14 @@ export function App() {
                         />
                         <div className="position-sliders">
                           <Slider
-                            label="Horizontal"
+                            label="X position"
                             min={0}
                             max={100}
                             value={settings.imageX}
                             onChange={(n) => update({ imageX: n })}
                           />
                           <Slider
-                            label="Vertical"
+                            label="Y position"
                             min={0}
                             max={100}
                             value={settings.imageY}

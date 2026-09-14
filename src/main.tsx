@@ -13,7 +13,7 @@ function Output() {
       <video autoPlay muted playsInline aria-label="Processed studio output" />
       {!window.opener && (
         <p>
-          Open Clean output from the Magic Cam studio to connect its processed
+          Open OBS Output from the Magic Cam studio to connect its processed
           video.
         </p>
       )}

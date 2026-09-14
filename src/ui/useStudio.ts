@@ -1,21 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { Studio } from "../core/studio";
 import { defaults, initialState, type Settings } from "../core/types";
+import { loadControls, saveControls } from "../core/preferences";
 
 export function useStudio() {
+  const saved = useRef(loadControls()).current;
   const canvas = useRef<HTMLCanvasElement>(null),
     studio = useRef<Studio | null>(null),
     fileInput = useRef<HTMLInputElement>(null);
   const [state, setState] = useState(initialState),
-    [settings, setSettings] = useState<Settings>({ ...defaults });
+    [settings, setSettings] = useState<Settings>(saved.settings);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]),
     [deviceId, setDeviceId] = useState("");
-  const [duration, setDuration] = useState(5),
+  const [duration, setDuration] = useState(saved.duration),
+    [customSeconds, setCustomSeconds] = useState(saved.customSeconds),
     [imageName, setImageName] = useState(""),
     [imageUrl, setImageUrl] = useState("");
   const [notice, setNotice] = useState(""),
     [help, setHelp] = useState(false),
     [uploading, setUploading] = useState(false);
+  const currentControls = useRef({ settings, duration, customSeconds });
+  currentControls.current = { settings, duration, customSeconds };
   const imageGeneration = useRef(0);
   const live = state.capture === "live",
     starting = state.capture === "starting";
@@ -32,6 +37,7 @@ export function useStudio() {
   }
   useEffect(() => {
     studio.current = new Studio(canvas.current!, setState);
+    studio.current.update(settings);
     void refreshDevices();
     navigator.mediaDevices?.addEventListener("devicechange", refreshDevices);
     return () => {
@@ -43,6 +49,18 @@ export function useStudio() {
         refreshDevices,
       );
     };
+  }, []);
+  useEffect(() => {
+    const timeout = window.setTimeout(
+      () => saveControls(currentControls.current),
+      120,
+    );
+    return () => window.clearTimeout(timeout);
+  }, [settings, duration, customSeconds]);
+  useEffect(() => {
+    const flush = () => saveControls(currentControls.current);
+    window.addEventListener("pagehide", flush);
+    return () => window.removeEventListener("pagehide", flush);
   }, []);
   useEffect(
     () => () => {
@@ -123,12 +141,12 @@ export function useStudio() {
     setNotice("");
   }
   const trackingLabel = {
-    off: "Tracking off",
-    loading: "Loading face model",
-    searching: "Looking for a face",
+    off: "Face tracking off",
+    loading: "Loading face tracker",
+    searching: "Searching for face",
     tracked: "Face tracked",
     lost: "Face lost",
-    error: "Tracker unavailable",
+    error: "Face tracker unavailable",
   }[state.tracking];
   return {
     canvas,
@@ -141,6 +159,8 @@ export function useStudio() {
     setDeviceId,
     duration,
     setDuration,
+    customSeconds,
+    setCustomSeconds,
     imageName,
     imageUrl,
     notice,

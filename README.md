@@ -2,7 +2,7 @@
 
 # Magic Cam
 
-Local webcam effects for OBS, built with React, Canvas 2D, and MediaPipe. Frames and uploaded images stay in the browser; there is no video backend, analytics, or cloud inference.
+On-device webcam processing for OBS, built with React, Canvas 2D, and MediaPipe. Frames and uploaded images stay in the browser; there is no video backend, analytics, or cloud inference.
 
 [Open Magic Cam](https://0xdeadbife.github.io/magic-cam/)
 
@@ -10,15 +10,17 @@ Local webcam effects for OBS, built with React, Canvas 2D, and MediaPipe. Frames
 
 ## What it does
 
-- Smooth background blur with adjustable strength and edge falloff.
-- Fine monochrome film grain with amount and texture controls.
-- Stable face pixelation with adjustable block size.
-- Final-frame hold for a timed duration or until release. Press `Space` to hold and release.
-- Local image overlay or webcam replacement, with position, scale, and opacity controls.
+- **Backdrop Blur** isolates the person and graduates blur across the background.
+- **Film Grain** adds fine monochrome texture with adjustable intensity and scale.
+- **Face Mosaic** pixelates the tracked face with adjustable block size.
+- **Frame Hold** freezes the final composition for a timed duration or until release. Press `Space` to freeze and release.
+- **Image Layer** overlays a local image or replaces the camera feed, with position, scale, and opacity controls.
 - Camera selection, mirroring, reset, and measured render FPS and inference duration.
 - A clean shared output window for OBS, without a second camera or model pipeline.
 
 Effects can be combined. Reset returns to the live, unmodified camera.
+
+Visual settings and hold duration are remembered for this site in the browser. Uploaded images remain session-only and are released when removed or the page closes.
 
 ### Compact controls
 
@@ -89,9 +91,9 @@ npm run test:e2e
 npm run test:pages
 ```
 
-The browser suite covers camera lifecycle, real MediaPipe Worker inference, fallback tracking, pixelation, blur, grain, image layers, freeze/release, keyboard control, responsive layout, and the shared output stream. `test:pages` serves the production bundle from a repository-style subpath and rejects unexpected external requests.
+The browser suite covers camera lifecycle, real MediaPipe Worker inference, fallback tracking, Face Mosaic, Backdrop Blur, Film Grain, Image Layer, Frame Hold, keyboard control, saved settings, responsive layout, and the shared output stream. `test:pages` serves the production bundle from a repository-style subpath and rejects unexpected external requests.
 
-A physical webcam and OBS still need a manual pass for permissions, device switching, fast movement, difficult lighting, background-window throttling, capture cropping, and the final virtual-camera handoff. Face pixelation is a visual effect, not an anonymity guarantee.
+A physical webcam and OBS still need a manual pass for permissions, device switching, fast movement, difficult lighting, background-window throttling, capture cropping, and the final virtual-camera handoff. Face Mosaic is a visual effect, not an anonymity guarantee.
 
 ## MediaPipe assets
 

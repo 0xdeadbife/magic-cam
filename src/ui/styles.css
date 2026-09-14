@@ -608,6 +608,24 @@ input[type="range"]::-moz-range-thumb {
   width: 96px;
   font-size: 13px;
 }
+.shortcut-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.shortcut-note kbd {
+  min-width: 42px;
+  padding: 3px 6px;
+  border: 1px solid #424345;
+  border-radius: 3px;
+  background: #202123;
+  color: #d0d1d1;
+  font: inherit;
+  line-height: 1;
+  text-align: center;
+}
 .upload-zone {
   width: 100%;
   min-height: 88px;

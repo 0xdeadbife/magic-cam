@@ -33,7 +33,7 @@ export class PersonSegmenter {
     try {
       if (!("OffscreenCanvas" in window))
         throw new Error(
-          "Background blur needs a browser with Worker canvas support. Try Chrome or Edge.",
+          "Backdrop Blur needs a browser with Worker canvas support. Try Chrome or Edge.",
         );
       const worker = (this.worker = new Worker(
         appUrl("segmentation-worker.js"),

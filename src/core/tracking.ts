@@ -116,7 +116,7 @@ export class FaceTracker {
           this.watchdog = setTimeout(
             () =>
               this.fail(
-                "Face tracker stopped responding. Toggle pixelation to retry.",
+                "Face tracker stopped responding. Toggle Face Mosaic to retry.",
               ),
             5000,
           );

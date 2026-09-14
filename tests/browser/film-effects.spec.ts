@@ -323,47 +323,47 @@ test("real segmentation worker combines with grain, freeze and reset without ext
     "data-live",
     "true",
   );
-  await page.getByRole("switch", { name: "Enable background blur" }).click();
-  await page.getByRole("switch", { name: "Enable film grain" }).click();
+  await page.getByRole("switch", { name: "Enable Backdrop Blur" }).click();
+  await page.getByRole("switch", { name: "Enable Film Grain" }).click();
   await expect(page.getByTestId("segmentation-status")).toContainText("ms", {
     timeout: 30000,
   });
-  await page.getByRole("slider", { name: "Blur amount" }).fill("0");
+  await page.getByRole("slider", { name: "Strength" }).fill("0");
   await expect(page.getByTestId("segmentation-status")).toContainText(
-    "Amount is zero",
+    "Strength at 0%",
   );
   await expect.poll(() => page.workers().length).toBe(0);
-  await page.getByRole("slider", { name: "Blur amount" }).fill("45");
+  await page.getByRole("slider", { name: "Strength" }).fill("45");
   await expect(page.getByTestId("segmentation-status")).toContainText("ms", {
     timeout: 30000,
   });
   expect(page.workers().length).toBe(1);
-  await page.getByRole("switch", { name: "Enable face pixelation" }).click();
+  await page.getByRole("switch", { name: "Enable Face Mosaic" }).click();
   await expect(page.getByTestId("tracking-status")).toHaveAttribute(
     "data-mode",
     "worker",
     { timeout: 30000 },
   );
   expect(page.workers().length).toBe(2);
-  await page.getByRole("combobox", { name: "Hold for" }).selectOption("0");
+  await page.getByRole("combobox", { name: "Duration" }).selectOption("0");
   await page.getByRole("button", { name: "Freeze frame", exact: true }).click();
   const held = await page
     .locator("canvas")
     .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
-  await page.getByRole("slider", { name: "Grain amount" }).fill("100");
-  await page.getByRole("slider", { name: "Blur amount" }).fill("100");
+  await page.getByRole("slider", { name: "Intensity" }).fill("100");
+  await page.getByRole("slider", { name: "Strength" }).fill("100");
   await page.waitForTimeout(300);
   expect(
     await page
       .locator("canvas")
       .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL()),
   ).toBe(held);
-  await page.getByRole("button", { name: "Reset all effects" }).click();
+  await page.getByRole("button", { name: "Reset visual settings" }).click();
   await expect(
-    page.getByRole("switch", { name: "Enable film grain" }),
+    page.getByRole("switch", { name: "Enable Film Grain" }),
   ).toHaveAttribute("aria-checked", "false");
   await expect(
-    page.getByRole("switch", { name: "Enable background blur" }),
+    page.getByRole("switch", { name: "Enable Backdrop Blur" }),
   ).toHaveAttribute("aria-checked", "false");
   await expect.poll(() => page.workers().length).toBe(0);
   expect(errors).toEqual([]);
@@ -415,8 +415,8 @@ test("portrait camera stream renders both effects with measured performance and 
     "data-live",
     "true",
   );
-  await page.getByRole("switch", { name: "Enable background blur" }).click();
-  await page.getByRole("switch", { name: "Enable film grain" }).click();
+  await page.getByRole("switch", { name: "Enable Backdrop Blur" }).click();
+  await page.getByRole("switch", { name: "Enable Film Grain" }).click();
   await expect(page.getByTestId("segmentation-status")).toHaveAttribute(
     "data-state",
     "ready",
@@ -445,7 +445,7 @@ test("portrait camera stream renders both effects with measured performance and 
     fullPage: true,
   });
   const opening = page.waitForEvent("popup");
-  await page.getByRole("button", { name: "Open clean output" }).click();
+  await page.getByRole("button", { name: "Open OBS output" }).click();
   const output = await opening;
   await expect
     .poll(() =>
